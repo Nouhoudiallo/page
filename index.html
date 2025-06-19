@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LumiRex Transcript</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            background-color: #f3f4f6;
+        }
+
+        h1 {
+            color: #111827;
+        }
+
+        #result {
+            white-space: pre-wrap;
+            margin-top: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            padding: 0.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎙️ LumiRex Transcript</h1>
+    <p>Uploader un fichier audio (.mp3 ou .wav) pour obtenir la transcription avec Whisper</p>
+
+    <input type="file" id="audioFile" accept=".mp3, .wav" />
+    <br>
+    <button onclick="transcrire()">Transcrire</button>
+
+    <div id="result">⏳ En attente de transcription...</div>
+
+    <script>
+        async function transcrire() {
+            const fileInput = document.getElementById("audioFile");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Veuillez choisir un fichier audio.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            document.getElementById("result").innerText = "🔄 Transcription en cours...";
+
+            try {
+                const res = await fetch("https://huggingface.co/spaces/nouhou231/transcipt-lumirex/transcrire"
+                    , {
+                        method: "POST",
+                        body: formData
+                    });
+
+                const data = await res.json();
+                document.getElementById("result").innerText = "✅ Transcription :\n\n" + data.transcription;
+            } catch (error) {
+                console.error(error);
+                document.getElementById("result").innerText = "❌ Erreur pendant la transcription.";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
