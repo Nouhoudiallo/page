@@ -44,34 +44,40 @@
     <div id="result">⏳ En attente de transcription...</div>
 
     <script>
-        async function transcrire() {
-            const fileInput = document.getElementById("audioFile");
-            const file = fileInput.files[0];
-            if (!file) {
-                alert("Veuillez choisir un fichier audio.");
-                return;
-            }
+  async function transcrire() {
+    const fileInput = document.getElementById("audioFile");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Veuillez choisir un fichier audio.");
+      return;
+    }
 
-            const formData = new FormData();
-            formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-            document.getElementById("result").innerText = "🔄 Transcription en cours...";
+    document.getElementById("result").innerText = "🔄 Transcription en cours...";
 
-            try {
-                const res = await fetch("https://huggingface.co/spaces/nouhou231/transcipt-lumirex/transcrire"
-                    , {
-                        method: "POST",
-                        body: formData
-                    });
+    try {
+      const res = await fetch("https://nouhou231-transcipt-lumirex.hf.space/transcrire", {
+        method: "POST",
+        body: formData
+      });
 
-                const data = await res.json();
-                document.getElementById("result").innerText = "✅ Transcription :\n\n" + data.transcription;
-            } catch (error) {
-                console.error(error);
-                document.getElementById("result").innerText = "❌ Erreur pendant la transcription.";
-            }
-        }
-    </script>
+      const data = await res.json();
+      if (data.transcription) {
+        document.getElementById("result").innerText = "✅ Transcription :\n\n" + data.transcription;
+      } else if (data.error) {
+        document.getElementById("result").innerText = "❌ Erreur : " + data.error;
+      } else {
+        document.getElementById("result").innerText = "❌ Réponse inattendue du serveur.";
+      }
+
+    } catch (error) {
+      console.error(error);
+      document.getElementById("result").innerText = "❌ Erreur côté client : " + error;
+    }
+  }
+</script>
 
 </body>
 
